@@ -1,0 +1,192 @@
+﻿@model WebApplication7.ViewModel.DepartmentViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">ADD NEW</button>
+
+<table class="table table-bordered table-striped" id="myTable">
+    <thead>
+        <tr>
+            <th>SL</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>IsActive</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+</table>
+
+<form id="departmentForm">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title" id="exampleModalLabel">ADD NEW SCHOOL </p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+                            <input type="hidden" name="Id" id="Id" class="form-control" />
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Name, new { @class = "from-control" })
+                                    @Html.ValidationMessageFor(model => model.Name)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IsActive, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.IsActive, new { @class = "from-control" })
+                                    @Html.ValidationMessageFor(model => model.IsActive)
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveDepartment">Save changes</button>
+                    <button type="button" class="btn btn-primary" id="updateDepartment">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadAllDepartmentdata();
+            $("#updateDepartment").hide();
+        })        
+        function LoadAllDepartmentdata() {
+            $("#myTable").DataTable({
+                paging: true,
+                searching: true,
+                destroy: true,
+                "ajax": {
+                    "url": "/Department/loaddata",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+
+                     { "data": null, render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                     { "data": "Id", "autoWidth": true, visible: false },
+                     { "data": "Name" },
+                     { "data": "IsActive" },
+                     {
+                         data: null, render: function (data, type, row) {
+                             return "<a href='#' class='btn btn-danger btn-sm' onclick=DeleteData('" + row.Id + "'); >Delete</a>" + " " + "<a href='#' class='btn btn-info btn-sm' onclick=EditData('" + row.Id + "'); >Edit</a>";
+                         }
+                     }
+                ]
+            });
+        };
+        $("#saveDepartment").click(function () {
+
+            $.ajax({
+                url: "/Department/Save",
+                type: "POST",
+                data: $("#departmentForm").serialize(),
+                success: function (respons) {
+                    debugger;
+                    LoadAllDepartmentdata();
+                    toastr.success(respons, 'New Department Name');
+
+                    $('#departmentForm')[0].reset();                    
+                    $('#exampleModal').modal("hide");
+
+                },
+                error: function () {
+
+                }
+            });
+        });
+        function DeleteData(id) {
+            var x = confirm("Are you sure you want to delete?");
+            if (x)
+                $.ajax({
+                    url: "/Department/DeleteDepartment",
+                    type: "GET",
+                    data: { id: id },
+                    datatype: "json",
+                    success: function (respons) {
+                        LoadAllDepartmentdata();
+                        toastr.success(respons, 'Department Name');
+                    },
+                    error: function () {
+                        alert('rrr');
+                    }
+                })
+            else
+                return false;
+        }
+
+        //edit
+        function EditData(id) {
+            debugger;
+
+            $("#exampleModalLabel").html("Update Record")
+            $('#exampleModal').modal();
+            $("#updateDepartment").show();
+            $("#saveDepartment").hide();
+
+            $.ajax({
+                url: "/Department/EditDepartment",
+                type: "GET",
+                data: { id: id },
+                success: function (respons) {
+                    var data = JSON.parse(respons);
+                    debugger;
+                    $("#Id").val(data.Id);
+                    $("#Name").val(data.Name);
+                    $("#IsActive").checked;
+
+                    //$('#saveSchool').text("Update");
+                    //$('#saveSchool').prop('id', 'editButton');
+
+                },
+                error: function () {
+                    alert('rrr');
+                }
+            });
+        }
+
+        $("#updateDepartment").click(function () {
+            $.ajax({
+                url: "/Department/UpdateDepartment",
+                type: "POST",
+                data: $("#departmentForm").serialize(),
+                success: function (respons) {
+                    LoadAllDepartmentdata();
+                    toastr.success(respons, 'Department Name');
+                    
+                    $('#departmentForm')[0].reset();
+                    $('#exampleModal').modal("hide");
+
+                },
+                error: function () {
+
+                }
+            })
+        })
+
+    </script>
+}
+

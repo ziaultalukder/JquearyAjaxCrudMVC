@@ -1,0 +1,86 @@
+﻿@model WebApplication7.ViewModel.ClassViewModel
+
+@{
+    ViewBag.Title = "Index";
+    
+}
+
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">ADD NEW</button>
+
+<table class="table table-bordered table-striped" id="myTable">
+    <thead>
+        <tr>
+            <th>SL</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>IsActive</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+</table>
+
+
+<form id="departmentForm">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title" id="exampleModalLabel">ADD NEW CLASS</p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-horizontal">
+
+                            @Html.ValidationSummary(true)
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Name)
+                                    @Html.ValidationMessageFor(model => model.Name)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IsActive, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.IsActive)
+                                    @Html.ValidationMessageFor(model => model.IsActive)
+                                </div>
+                            </div>                        
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input type="submit" value="Create" class="btn btn-default" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveDepartment">Save changes</button>
+                    <button type="button" class="btn btn-primary" id="updateDepartment">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section scripts{
+    @*<script src="~/Scripts/Custom/Class.js"></script>*@
+}
